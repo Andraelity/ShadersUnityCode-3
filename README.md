@@ -4,80 +4,62 @@ Repo on Unity Shaders Study Case
 ![](InGameShaders.gif)
 
 # CHECK
-This file no updates regarding complexity of desing were added so the previous log would be used.
+It appears that the language design within unity, does not allow const variable to be used and keep its constantness, for some reason the values that are used with in runtime are not the correct ones just by its ´const´ modifier, so instead if you want to make use of the values you must make them static, this is an exaple of what I am trying to explain.
 
-```c#
 
-public class QuadScale : MonoBehaviour
-{
-   	private float RadiusMain = 0.0f;
+THIS IS SOMETHING REALLLY PARTICULAR!, we must take in consideratioon this representation, due to its error prone status.
 
-    private float RadiusCheck = 0.0f; 
-    private Transform dataWhereItIs;
 
-    void Awake()
-    {
-    	Debug.Log("LOG INPUT");
-        Debug.Log(transform.localScale);
-        // Transform childrenTransform = GetComponentInChildren<Transform>();
-        Transform childrenTransform = GetComponentInChildren(typeof(Transform)) as Transform;
- 
-        Debug.Log(childrenTransform.localScale);
-        Debug.Log(childrenTransform.rotation);
+```c++
 
-        dataWhereItIs = this.gameObject.transform.GetChild(0);
-        RadiusMain = dataWhereItIs.localScale.x;
-        RadiusCheck = dataWhereItIs.localScale.x;
+    /////////////////////////////
+    // WORKS CORRECT
+    /////////////////////////////
 
-        Debug.Log("OUTPUT2");
-        Debug.Log(dataWhereItIs.localScale);
-
-     //    Debug.Log(dataWhereItIs.rotation);
-        Debug.Log("LOG INPUT");
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-        dataWhereItIs = this.gameObject.transform.GetChild(0);
-        RadiusCheck = dataWhereItIs.localScale.x;
-		if(RadiusCheck != RadiusMain)
-		{
-            RadiusMain = RadiusCheck;
-			UpdateScale(RadiusMain);
-
-	
-    	}
-
-    }
-
-    void UpdateScale(float input)
-    {
-    	float ratioChange = 0.25f * input;
-
-		Vector3 valueToUpdate = new Vector3(ratioChange, ratioChange, ratioChange);	
-		transform.localScale = valueToUpdate;
-    }
-}
+        static float time;
+        static float2 mouse;
+        static float2 resolution;
+        
+        static const int iters = 256;
+        
+        static const float origin_z = 0.0;
+        static const float plane_z = 4.0;
+        static const float far_z = 64.0;
+        
+        static const float step = (far_z - plane_z) / float(iters) * 0.025;
+        
+        static const float color_bound = 0.0;
+        static const float upper_bound = 1.0;
+        
+        static const float scale = 32.0;
+        
+        static const float disp = 0.25;
 ```
 
 ``` c++
 
-            UNITY_INSTANCING_BUFFER_START(CommonProps)
-                UNITY_DEFINE_INSTANCED_PROP(fixed4, _FillColor)
-                UNITY_DEFINE_INSTANCED_PROP(float, _AASmoothing)
-                UNITY_DEFINE_INSTANCED_PROP(float, _rangeZero_Ten)
-                UNITY_DEFINE_INSTANCED_PROP(float, _rangeSOne_One)
-                UNITY_DEFINE_INSTANCED_PROP(float, _rangeZoro_OneH)
-                UNITY_DEFINE_INSTANCED_PROP(float, _mousePosition_x)
-                UNITY_DEFINE_INSTANCED_PROP(float, _mousePosition_y)
+    /////////////////////////////
+    // !!!!!!!!!!!!!!!!!DOES NOT WORK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /////////////////////////////
 
-            UNITY_INSTANCING_BUFFER_END(CommonProps)
-			
-			
-			float _mousePosition_x = UNITY_ACCESS_INSTANCED_PROP(CommonProps, _mousePosition_x);
-            float _mousePosition_y = UNITY_ACCESS_INSTANCED_PROP(CommonProps, _mousePosition_y);
-            float2 mouseCoordinate = mouseCoordinateFunc(_mousePosition_x, _mousePosition_y);
+        float time;
+        float2 mouse;
+        float2 resolution;
+        
+         const int iters = 256;
+        
+        const float origin_z = 0.0;
+        const float plane_z = 4.0;
+        const float far_z = 64.0;
+        
+        const float step = (far_z - plane_z) / float(iters) * 0.025;
+        
+        const float color_bound = 0.0;
+        const float upper_bound = 1.0;
+        
+        const float scale = 32.0;
+        
+        const float disp = 0.25;
+
+
 ``
